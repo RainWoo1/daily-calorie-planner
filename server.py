@@ -1,11 +1,13 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, render_template
+from pydub import AudioSegment
+import speech_recognition as sr
 import os
 
-app = Flask(__name__)
+# pip install flask
+# pip pydub
+# brew install ffmpeg
 
-UPLOAD_FOLDER = 'uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+app = Flask(__name__)
     
 @app.route("/")
 def index():
@@ -13,20 +15,21 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_audio():
-    try:
-        if 'audio' not in request.files:
-            return jsonify({'error': 'No audio file part in the request'}), 400
+    audio_file = request.files["audio_data"]
+    audio_file.save("./audio.webm")
 
-        audio_file = request.files['audio']
-        if audio_file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
+    audio = AudioSegment.from_file("audio.webm", format="webm")
+    audio.export("audio.wav", format="wav")
+    os.remove("./audio.webm")
 
-        file_path = os.path.join(UPLOAD_FOLDER, 'recording.wav')
-        audio_file.save(file_path)
 
-        return jsonify({'success': 'Audio file received successfully'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    recognizer = sr.Recognizer()
+    with sr.AudioFile("audio.wav") as source:
+        audio_data = recognizer.record(source)
+        text = recognizer.recognize_google(audio_data)
+        print(text)
+
+    return text, 200
 
 if __name__ == '__main__':
     app.run(debug=True)
