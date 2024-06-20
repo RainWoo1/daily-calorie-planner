@@ -2,9 +2,13 @@ document.addEventListener("DOMContentLoaded", () => {
     main();
 });
 
+
+
 function main() {
     const record_button = document.querySelector(".record-button");
-    const speech_to_text = document.querySelector(".speech-to-text");
+    const sentence = document.querySelector(".sentence");
+    const food_calories = document.querySelector(".food-calories");
+    const total_calories = document.querySelector(".total-calories");
     
     var mediaRecorder;
     var audioChunks = [];
@@ -33,8 +37,19 @@ function main() {
                     return response.text();
                 })
                 .then(data => {
-                    console.log('Response from server:', data);
-                    speech_to_text.textContent = data;
+                    split_data = data.split(";;")
+                    sentence.textContent = split_data[0];
+
+                    foods = split_data[1].split(";");
+                    for(var i = 0; i < foods.length; i++) {
+                        var newDiv = document.createElement("div");
+                        if (foods[i] != "") {
+                            newDiv.textContent = foods[i];
+                        }
+                        food_calories.appendChild(newDiv);
+                    }
+
+                    total_calories.textContent = split_data[2];
                 })
                 .catch(error => {
                     console.error('Error uploading file:', error);
@@ -45,12 +60,20 @@ function main() {
     
     record_button.onclick = () => {
         if (record_button.textContent == "Start Recording") {
+            sentence.innerHTML = "";
+            food_calories.innerHTML = "";
+            total_calories.innerHTML = "";
+
             record_button.textContent = "Stop Recording";
+            record_button.style.backgroundColor = "#ef2929";
+
             audioChunks = [];
             mediaRecorder.start();
         }
         else {
             record_button.textContent = "Start Recording";
+            record_button.style.backgroundColor = "#007bff";
+
             mediaRecorder.stop();
         }
     };
