@@ -1,0 +1,42 @@
+import React from 'react';
+import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
+
+interface CircleBoxProps {
+    text: string;
+    state: string;
+}
+
+const CircleBox: React.FC<CircleBoxProps> = ({ text, state }) => {
+    const backgroundColor = (state === 'past' ? '#FFFFFF' : (state === 'present' ? '#8A47EB' : '#EAEAEA'));;
+    const fontColor = (backgroundColor === '#8A47EB' ? '#FFFFFF' : '#000000');
+    return (
+        <TouchableHighlight style={[styles.container, {backgroundColor}]} underlayColor='transparent'>
+            <View style={styles.circle}>
+                <Text style={[styles.text, {color: fontColor}]}>{text}</Text>
+            </View>
+        </TouchableHighlight>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 50,
+        width: 50,
+        height: 50,
+        overflow: 'hidden',
+        marginRight: 5,
+    },
+    circle: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    text: {
+        fontSize: 15,
+    },
+});
+
+export default CircleBox;
