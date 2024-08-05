@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
 
 interface CircleBoxProps {
-    text: string;
-    state: string;
+    text: number;
+    state: number;
 }
 
 const CircleBox: React.FC<CircleBoxProps> = ({ text, state }) => {
-    const backgroundColor = (state === 'past' ? '#FFFFFF' : (state === 'present' ? '#8A47EB' : '#EAEAEA'));;
+    const backgroundColor = (text < state + 1 ? ('#FFFFFF') : (text > state + 1 ? ('#EAEAEA') : ('#8A47EB')));
     const fontColor = (backgroundColor === '#8A47EB' ? '#FFFFFF' : '#000000');
+
     return (
         <TouchableHighlight style={[styles.container, {backgroundColor}]} underlayColor='transparent'>
             <View style={styles.circle}>

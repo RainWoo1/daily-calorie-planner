@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
+from flask_cors import CORS
 from pydub import AudioSegment
 import speech_recognition as sr
 import os
@@ -11,6 +12,25 @@ import requests
 # brew install ffmpeg
 
 app = Flask(__name__)
+CORS(app)
+
+@app.route('/process', methods=['POST'])
+def process_text():
+    data = request.get_json()
+    sentence = data.get('text').split('.')
+
+
+    app_id = "d5fd616b"
+    app_key = "5c06fb4f5bd545920f9d620b5a5a63d4"
+    queries = get_food(sentence)
+    print(queries)
+    queries_for_nutrients = auto_complete_api_request(queries, app_id, app_key)
+    calories_information, total_calories = calory_api_request(queries_for_nutrients, queries, app_id, app_key)
+    
+    print(calories_information, total_calories)
+    calories_text = append_text_calories(sentence, calories_information, total_calories)
+
+    return jsonify({'output': calories_text})
 
 @app.route("/")
 def index():
@@ -134,15 +154,15 @@ def calory_api_request(queries_for_nutrients, queries, app_id, app_key):
 def append_text_calories(sentence, calories_information, total_calories):
     full_text = ""
     for text in sentence:
-        full_text += text.capitalize() + ";"
-    full_text += ";"
+        full_text += text.capitalize() + "\n"
+    full_text += "\n"
 
     for food in calories_information:
         for key, value in food.items():
-            full_text += key.capitalize() + ": " + str(round(value, 2)) + " calories;"
-    full_text += ";"
+            full_text += key.capitalize() + ": " + str(round(value, 2)) + " calories\n"
+    full_text += "\n"
 
-    full_text += str(round(total_calories, 2)) + " calories"
+    full_text += "Total Calories: " + str(round(total_calories, 2)) + " calories"
 
     return full_text
 

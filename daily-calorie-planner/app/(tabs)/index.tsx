@@ -1,33 +1,35 @@
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import InfoPage1 from './info_page1';
+import InfoPage2 from './info_page2';
+import InfoPage3 from './info_page3';
+import InfoPage4 from './info_page4';
 import CircleBox from './circlebox';
-import OvalBox from './ovalbox';
 import SquareBox from './squarebox'
 
-export default function HomeScreen() {
+const InfoPage = () => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const pages = [<InfoPage1/>, <InfoPage2/>, <InfoPage3/>, <InfoPage4/>];
+
+    const handlePreviousPress = () => {
+        setCurrentPage((prevPage) => (prevPage - 1 + pages.length) % pages.length);
+    };
+    const handleNextPress = () => {
+        setCurrentPage((prevPage) => (prevPage + 1) % pages.length);
+    };
 	return (
         <View style={styles.container}>
             <View style={styles.circleContainer}>
-                <CircleBox text='1' state='past'/>
-                <CircleBox text='2' state='present'/>
-                <CircleBox text='3' state='future'/>
-                <CircleBox text='4' state='future'/>
+                <CircleBox text={1} state={currentPage}/>
+                <CircleBox text={2} state={currentPage}/>
+                <CircleBox text={3} state={currentPage}/>
+                <CircleBox text={4} state={currentPage}/>
                 <Text style={styles.skipContainer}>Skip</Text>
             </View>
-            <Text style={styles.titleContainer}>Any ingredient allergies?</Text>
-            <Text style={styles.subTitleContainer}>To offer you the best tailored diet experience we need to know more information about you.</Text>
-            <View style={styles.ovalContainer}>
-                <OvalBox text='Gluten'/>
-                <OvalBox text='Diary'/>
-                <OvalBox text='Egg'/>
-                <OvalBox text='Soy'/>
-                <OvalBox text='Peanut'/>
-                <OvalBox text='Wheat'/>
-                <OvalBox text='Milk'/>
-                <OvalBox text='Fish'/>
-            </View>
+            {pages[currentPage]}
             <View style={styles.squareContainer}>
-                <SquareBox text='Previous'/>
-                <SquareBox text='Next'/>
+                <SquareBox text='Previous' onPress={handlePreviousPress}/>
+                <SquareBox text='Next' onPress = {handleNextPress}/>
             </View>
         </View>
 	);
@@ -41,7 +43,7 @@ const styles = StyleSheet.create({
 		paddingRight: 100,
         backgroundColor: '#FFFFFF'
   	},
-    circleContainer : {
+      circleContainer : {
         flexDirection: 'row',
     },
     skipContainer : {
@@ -53,21 +55,10 @@ const styles = StyleSheet.create({
         color: '#1F73F1',
         fontWeight: 'bold',
     },
-	titleContainer: {
-        marginTop: 20,
-		fontSize: 25,
-		fontWeight: 'bold',
-		paddingBottom: 20,
-	},
-	subTitleContainer: {
-		fontSize: 20,
-	},
-    ovalContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-    },
     squareContainer: {
         marginTop: 30,
         flexDirection: 'row',
     }
 });
+
+export default InfoPage;
