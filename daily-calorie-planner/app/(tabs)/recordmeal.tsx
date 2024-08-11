@@ -64,24 +64,33 @@ const App = () => {
     };
 
     const stopRecording = async () => {
-        console.log('Stopping recording..');
-        recording?.stopAndUnloadAsync();
-        const uri = recording?.getURI();
-        setRecordingUri(uri);
-        setRecording(null);
-        console.log('Recording stopped and stored at', uri);
+        try {
+            console.log('Stopping recording...');
+            await recording?.stopAndUnloadAsync();
+            const uri = recording?.getURI();
+            setRecordingUri(uri || null);
+            setRecording(null);
+            console.log('Recording stopped and stored at', uri);
+
+        } catch (err) {
+            console.error('Failed to stop recording', err);
+        }
     };
 
     const sendRecording = async () => {
         if (recordingUri) {
-            const formData = new FormData();
-            formData.append('file', {
-                uri: recordingUri,
-                type: 'audio/m4a',
-                name: 'test.m4a',
-            });
-
             try {
+                // Convert blob URI to file system URI
+                // const fileUri = recordingUri.replace('blob:', '');
+                console.log("Sending file URI:", recordingUri);
+
+                const formData = new FormData();
+                formData.append('file', {
+                    uri: recordingUri,
+                    type: 'audio/m4a',
+                    name: 'test.m4a',
+                });
+
                 const response = await fetch('http://127.0.0.1:5000/uploadApp', {
                     method: 'POST',
                     body: formData,
@@ -89,12 +98,19 @@ const App = () => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed: ' + response.statusText);
+                }
+
                 const data = await response.json();
                 console.log('Upload Success:', data);
             }
             catch (error) {
                 console.error('Upload Error:', error);
             }
+        } else {
+            console.error('Recording URI is null, nothing to send.');
         }
     };
 
