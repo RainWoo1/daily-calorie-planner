@@ -14,6 +14,20 @@ import requests
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/uploadApp', methods=['POST'])
+def save_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    if file:
+        # Save the file to the desired location
+        file.save(f"./{file.filename}")
+        return jsonify({'message': 'File uploaded successfully'}), 200
+
 @app.route('/process', methods=['POST'])
 def process_text():
     data = request.get_json()
