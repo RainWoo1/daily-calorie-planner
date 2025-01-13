@@ -57,9 +57,6 @@ def upload_calories():
     os.remove("./audio.webm")
 
 
-    app_id = "d5fd616b"
-    app_key = "5c06fb4f5bd545920f9d620b5a5a63d4"
-
     sentence = convert_audio_to_text()
     queries = get_food(sentence)
     queries_for_nutrients = auto_complete_api_request(queries, app_id, app_key)
